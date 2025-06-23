@@ -1,0 +1,200 @@
+
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Deteksi Penyakit Berdasarkan Gejala</title>
+  <style>
+    :root {
+      --primary-color: #000;
+      --secondary-color: #666;
+      --accent-color: #0071e3;
+      --background-color: #fff;
+      --card-bg: #f9f9f9;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--background-color);
+      color: var(--primary-color);
+      margin: 0;
+      padding: 2rem;
+      line-height: 1.6;
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      color: var(--secondary-color);
+      margin-bottom: 2rem;
+    }
+
+    .checkbox-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+
+    input[type="checkbox"] {
+      accent-color: var(--accent-color);
+      width: 18px;
+      height: 18px;
+    }
+
+    button {
+      background-color: var(--accent-color);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #005bb5;
+    }
+
+    #hasil {
+      margin-top: 2rem;
+      background-color: var(--card-bg);
+      padding: 1.5rem;
+      border-radius: 12px;
+      border: 1px solid #e0e0e0;
+    }
+
+    .penyakit-pasti {
+      color: #007e33;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .penyakit-kemungkinan {
+      color: #ff8800;
+      font-weight: 500;
+      margin-top: 1rem;
+    }
+
+    ul {
+      padding-left: 1.2rem;
+    }
+
+    li {
+      margin-bottom: 0.5rem;
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Deteksi Penyakit Berdasarkan Gejala</h1>
+  <p>Pilih gejala yang kamu rasakan:</p>
+  <div class="checkbox-list" id="gejala-list"></div>
+  <button onclick="deteksiPenyakit()">Deteksi Penyakit</button>
+  <div id="hasil"></div>
+
+  <script>
+      const dataPenyakit = [
+      { nama: "Infeksi Virus Ringan", gejala: ["batuk", "pilek", "sakit tenggorokan", "demam ringan", "bersin"] },
+      { nama: "ISPA Ringan", gejala: ["batuk", "pilek", "sakit tenggorokan", "kelelahan", "demam ringan"] },
+      { nama: "Common Cold", gejala: ["hidung meler", "batuk", "bersin", "sakit kepala ringan", "tenggorokan sakit"] },
+      { nama: "Faringitis Ringan", gejala: ["tenggorokan sakit", "demam ringan", "sulit menelan", "batuk"] },
+      { nama: "Gastritis Ringan", gejala: ["nyeri ulu hati", "mual", "muntah", "cepat kenyang", "perut kembung"] },
+      { nama: "Diare Akut", gejala: ["buang air encer", "kram perut", "mual", "muntah", "demam"] },
+      { nama: "Migrain Ringan", gejala: ["nyeri kepala berdenyut", "mual", "sensitif cahaya/suara"] },
+      { nama: "Infeksi Virus Umum", gejala: ["batuk", "pilek", "sakit kepala", "demam ringan", "nyeri otot ringan"] },
+      { nama: "Sinusitis Ringan", gejala: ["nyeri di wajah", "hidung tersumbat", "batuk", "sakit kepala"] },
+      { nama: "Gastroenteritis Ringan", gejala: ["diare", "mual", "muntah", "nyeri perut", "demam ringan"] },
+      { nama: "Influenza", gejala: ["demam tinggi", "batuk", "nyeri otot", "kelelahan", "sakit kepala"] },
+      { nama: "Tifoid", gejala: ["demam naik bertahap", "nyeri perut", "lemas", "sembelit/diare", "sakit kepala"] },
+      { nama: "Keracunan Makanan", gejala: ["mual", "muntah", "diare", "kram perut", "demam ringan"] },
+      { nama: "Tonsilitis", gejala: ["tenggorokan sakit", "demam", "amandel bengkak", "nyeri saat menelan"] },
+      { nama: "Rhinitis Alergi", gejala: ["bersin", "hidung gatal/berair", "mata merah/gatal", "hidung tersumbat"] },
+      { nama: "COVID-19 Ringan", gejala: ["demam", "batuk kering", "kelelahan", "hilang penciuman/rasa"] },
+      { nama: "COVID-19 Sedang", gejala: ["sesak ringan", "batuk", "demam", "nyeri otot", "dada terasa berat"] },
+      { nama: "ISPA Berat", gejala: ["demam tinggi", "batuk berat", "sesak napas", "nyeri dada"] },
+      { nama: "Flu Perut", gejala: ["muntah", "diare", "mual", "nyeri perut", "demam ringan"] },
+      { nama: "Heat Exhaustion", gejala: ["keringat berlebihan", "lelah", "pusing", "mual", "kram otot"] },
+      { nama: "Bronkitis Ringan", gejala: ["batuk berdahak", "nyeri dada ringan", "kelelahan", "sesak ringan"] },
+      { nama: "Refluks Asam Lambung (GERD)", gejala: ["dada terasa panas", "mual", "batuk kering", "asam naik ke tenggorokan"] },
+      { nama: "Faringitis", gejala: ["sakit tenggorokan", "demam", "nyeri saat menelan", "batuk"] },
+      { nama: "Pneumonia", gejala: ["demam tinggi", "batuk berdahak", "sesak napas", "nyeri dada", "lemas"] },
+      { nama: "DBD Ringan (fase awal)", gejala: ["demam mendadak tinggi", "nyeri otot/sendi", "ruam merah", "mual"] },
+      { nama: "Demam Berdarah (fase lanjut)", gejala: ["perdarahan", "muntah terus-menerus", "penurunan trombosit drastis", "lemas berat"] },
+      { nama: "Legionnaires’ Disease", gejala: ["batuk", "demam", "sesak", "nyeri otot", "mual", "diare"] },
+      { nama: "Campak Ringan", gejala: ["demam", "batuk", "pilek", "ruam merah", "mata merah"] },
+      { nama: "Adenovirus", gejala: ["demam", "batuk", "sakit tenggorokan", "mata merah", "diare"] },
+      { nama: "Laringitis", gejala: ["suara serak/hilang", "tenggorokan kering", "batuk ringan", "nyeri saat bicara"] },
+      { nama: "Infeksi Virus Saluran Pencernaan", gejala: ["muntah", "diare", "nyeri perut", "mual", "demam ringan"] },
+      { nama: "COVID-19 Awal", gejala: ["demam", "batuk", "kehilangan penciuman/perasa", "tenggorokan sakit", "sakit kepala"] }
+    ];
+
+    const semuaGejala = [...new Set(dataPenyakit.flatMap(p => p.gejala))].sort();
+    const gejalaListDiv = document.getElementById('gejala-list');
+    semuaGejala.forEach(g => {
+      gejalaListDiv.innerHTML += `<label><input type="checkbox" value="${g}"> ${g}</label>`;
+    });
+
+    function deteksiPenyakit() {
+      const dipilih = [...document.querySelectorAll('input[type=checkbox]:checked')].map(cb => cb.value);
+      const hasil = dataPenyakit
+        .map(p => {
+          const cocok = p.gejala.filter(g => dipilih.includes(g)).length;
+          const persentase = Math.round((cocok / p.gejala.length) * 100);
+          return { ...p, cocok, persentase };
+        })
+        .filter(p => p.cocok > 0)
+        .sort((a, b) => b.persentase - a.persentase);
+
+      const hasilDiv = document.getElementById('hasil');
+      if (hasil.length === 0) {
+        hasilDiv.innerHTML = "<strong>Tidak ada penyakit yang cocok dengan gejala yang dipilih.</strong>";
+      } else {
+        const pasti = hasil.filter(p => p.persentase >= 80);
+        const kemungkinan = hasil.filter(p => p.persentase < 80);
+
+        let output = "";
+        if (pasti.length > 0) {
+          output += `<p class='penyakit-pasti'>Penyakit yang sangat mungkin diderita:</p><ul>`;
+          output += pasti.map(p => `<li>${p.nama} (${p.persentase}%)</li>`).join('');
+          output += `</ul>`;
+        }
+        if (kemungkinan.length > 0) {
+          output += `<p class='penyakit-kemungkinan'>Kemungkinan penyakit lainnya:</p><ul>`;
+          output += kemungkinan.map(p => `<li>${p.nama} (${p.persentase}%)</li>`).join('');
+          output += `</ul>`;
+        }
+        hasilDiv.innerHTML = output;
+      }
+    }
+  </script>
+</body>
+</html>
